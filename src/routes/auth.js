@@ -15,7 +15,7 @@ const router = express.Router();
 const COOKIE_OPTS = {
   httpOnly: true,
   secure: config.nodeEnv === 'production',
-  sameSite: config.nodeEnv === 'production' ? 'lax' : 'lax',
+  sameSite: config.nodeEnv === 'production' ? 'none' : 'lax',
   maxAge: 7 * 24 * 60 * 60 * 1000,
   path: '/',  // broad path so the proxy doesn't strip it
 };

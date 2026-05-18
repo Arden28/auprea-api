@@ -71,8 +71,10 @@ app.use((_req, res) => res.status(404).json({ error: 'Not found' }));
 app.use(errorHandler);
 
 /* ── Start ──────────────────────────────────────────────────────────────── */
-app.listen(config.port, () => {
-  console.log(`Auprea API running on port ${config.port} [${config.nodeEnv}]`);
-});
+if (process.env.VERCEL !== '1') {
+  app.listen(config.port, () => {
+    console.log(`Auprea API running on port ${config.port} [${config.nodeEnv}]`);
+  });
+}
 
 module.exports = app;

@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String?
+  firstName     String
+  lastName      String
+  dateOfBirth   String?
+  placeOfBirth  String?
+  birthName     String?
+  usedName      String?
+  phone         String?
+  street        String?
+  city          String?
+  state         String?
+  zip           String?
+  country       String?
+  taxId         String?
+  annualIncome  Float?
+  netWorth      Float?
+  maritalStatus String?
+  googleId      String?  @unique
+  linkedinId    String?  @unique
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  spouse        Spouse?
+  children      Child[]
+  nextOfKin     NextOfKin[]
+  bankAccounts  BankAccount[]
+  assets        Asset[]
+  debts         Debt[]
+  notifications Notification[]
+  familyMembers FamilyMember[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Spouse {
+  id           String  @id @default(uuid())
+  userId       String  @unique
+  birthName    String?
+  usedName     String?
+  firstNames   String?
+  dateOfBirth  String?
+  placeOfBirth String?
+  street       String?
+  city         String?
+  state        String?
+  zip          String?
+  country      String?
+  phone        String?
+  email        String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("spouses")
+}
+
+model Child {
+  id           String  @id @default(uuid())
+  userId       String
+  birthName    String?
+  usedName     String?
+  firstNames   String?
+  dateOfBirth  String?
+  placeOfBirth String?
+  street       String?
+  city         String?
+  state        String?
+  zip          String?
+  country      String?
+  phone        String?
+  email        String?
+  sortOrder    Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("children")
+}
+
+model NextOfKin {
+  id           String  @id @default(uuid())
+  userId       String
+  birthName    String?
+  usedName     String?
+  firstNames   String?
+  dateOfBirth  String?
+  placeOfBirth String?
+  relationship String?
+  street       String?
+  city         String?
+  state        String?
+  zip          String?
+  country      String?
+  phone        String?
+  email        String?
+  sortOrder    Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("next_of_kin")
+}
+
+model BankAccount {
+  id             String  @id @default(uuid())
+  userId         String
+  accountName    String?
+  bankName       String
+  accountType    String?
+  accountNumber  String?
+  approxBalance  String?
+  sortOrder      Int     @default(0)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("bank_accounts")
+}
+
+model Asset {
+  id        String     @id @default(uuid())
+  userId    String
+  name      String
+  category  String
+  value     Float      @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  documents Document[]
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("assets")
+}
+
+model Document {
+  id        String   @id @default(uuid())
+  assetId   String
+  fileName  String
+  createdAt DateTime @default(now())
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
+
+model Debt {
+  id        String   @id @default(uuid())
+  userId    String
+  name      String
+  category  String
+  amount    Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("debts")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model FamilyMember {
+  id     String @id @default(uuid())
+  userId String
+  name   String
+  email  String
+  role   String @default("Viewer")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("family_members")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
